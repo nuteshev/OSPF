@@ -1,0 +1,17 @@
+hostname zebra
+password zebra
+enable password zebra
+
+interface lo
+description loopback
+ip address 127.0.0.1/8
+
+interface eth1
+ip address {{ ansible_eth1.ipv4.address }}/24
+ip forwarding
+
+interface eth2
+ip address {{ ansible_eth2.ipv4.address }}/24
+ip forwarding
+
+log file /var/log/frr/zebra.log

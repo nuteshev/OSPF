@@ -1,0 +1,39 @@
+- hosts: all # part running on all hosts
+  become: true
+  tasks:
+  - sysctl:
+      name: net.ipv4.ip_forward
+      value: '1'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  - sysctl:
+      name: net.ipv4.conf.all.rp_filter
+      value: '0'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  - name: install packages 
+    yum:
+      name: "{{ packages }}"
+      state: present
+    vars:
+      packages:
+      - frr
+  - name: copy zebra.conf
+    template:
+      src: zebra.conf.j2
+      dest: /etc/frr/zebra.conf
+  - name: copy ospfd.conf
+    copy:
+      src: "{{ inventory_hostname }}/ospfd.conf"
+      dest: /etc/frr/ospfd.conf
+  - name: copy daemons
+    copy:
+      src: daemons 
+      dest: /etc/frr/daemons
+  - name: Start frr
+    service:
+      name: frr
+      state: restarted
+      enabled: yes
